@@ -22,9 +22,17 @@ internal static class Program
             RestartAsAdmin(args);
         }
 
-        string[] inputs = args;
+        CancelKeyPress += (sender, e) =>
+        {
+            e.Cancel = true; // prevent abrupt termination
+            "Exiting...".Write(ConsoleColor.Yellow);
+            Environment.Exit(0);
+        };
 
-        while (true)
+        string[] inputs = args;
+        bool running = true;
+
+        while (running)
         {
             "cleantemp > ".Write(ConsoleColor.Cyan);
             string? input = inputs.Length > 0 ? inputs[0] : ReadLine();
@@ -66,7 +74,8 @@ internal static class Program
                     break;
 
                 case "exit":
-                    return;
+                    running = false;
+                    break;
 
                 default:
                     "Invalid command! Available commands are cleantemp, fullclean and cleanprefetch".Write(ConsoleColor.Red);
@@ -98,13 +107,13 @@ internal static class Program
             foreach (FileInfo file in directory.GetFiles())
             {
                 file.Attributes = FileAttributes.Normal;
-                try { file.Delete(); } catch { success = false; }
+                //try { file.Delete(); } catch { success = false; }
             }
 
             foreach (DirectoryInfo dir in directory.GetDirectories())
             {
                 CleanFolderRecursive(dir);
-                try { dir.Delete(); } catch { success = false; }
+                //try { dir.Delete(); } catch { success = false; }
             }
 
             if (success)
@@ -130,12 +139,12 @@ internal static class Program
         {
             foreach (FileInfo file in directory.GetFiles())
             {
-                try { file.Delete(); } catch { success = false; }
+                //try { file.Delete(); } catch { success = false; }
             }
             foreach (DirectoryInfo dir in directory.GetDirectories())
             {
                 CleanFolderRecursive(dir);
-                try { dir.Delete(); } catch { success = false; }
+                //try { dir.Delete(); } catch { success = false; }
             }
             if (success)
                 $"{directory.FullName} cleaned".Write(ConsoleColor.Green);
@@ -159,7 +168,7 @@ internal static class Program
         {
             try
             {
-                item.InvokeVerb("delete");
+                //item.InvokeVerb("delete");
             }
             catch
             {
