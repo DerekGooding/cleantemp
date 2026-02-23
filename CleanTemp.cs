@@ -5,13 +5,12 @@ i was tired while doing it, this may contain minor bugs
 made just for fun and improving myself!
 :D
 */
-using System;
-using System.IO;
 using System.Security.Principal;
 using System.Diagnostics;
-using System.Threading;
 
-class CleanTemp
+namespace cleantemp;
+
+static class CleanTemp
 {
     static void Main(string[] args)
     {
