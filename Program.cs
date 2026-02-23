@@ -118,21 +118,21 @@ internal static class Program
 
     private static void EmptyRecycleBin()
     {
-        try
+        var shell = new Shell();
+        Folder recycleBin = shell.NameSpace(10);
+        foreach (FolderItem item in recycleBin.Items())
         {
-            var shell = new Shell();
-            Folder recycleBin = shell.NameSpace(10);
-            foreach (FolderItem item in recycleBin.Items())
+            try
             {
                 item.InvokeVerb("delete");
             }
+            catch
+            {
+                WriteColored($"Failed to delete: {item.Name}", ConsoleColor.Red);
+            }
+        }
 
-            WriteColored("Recycle Bin emptied", ConsoleColor.Green);
-        }
-        catch
-        {
-            WriteColored("Cannot empty recycle bin", ConsoleColor.Red);
-        }
+        WriteColored("Recycle Bin emptied", ConsoleColor.Green);
     }
 
     private static bool IsAdministrator()
