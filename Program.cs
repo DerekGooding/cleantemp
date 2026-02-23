@@ -5,15 +5,16 @@ i was tired while doing it, this may contain minor bugs
 made just for fun and improving myself!
 :D
 */
+
 using System.Security.Principal;
 using System.Diagnostics;
 using static System.Console;
 
 namespace CleanTemp;
 
-static class Program
+internal static class Program
 {
-    static void Main(string[] args)
+    private static void Main(string[] args)
     {
         if (!IsAdministrator())
         {
@@ -26,7 +27,7 @@ static class Program
             ForegroundColor = ConsoleColor.Cyan; // you can change color of "cleantemp >" by editing "ConsoleColor.Cyan" (like ConsoleColor.Red or ConsoleColor.Yellow). you can also do this to other lines that has this.
             Write("cleantemp > ");
             ResetColor();
-            string input = args.Length > 0 ? args[0] : Console.ReadLine();
+            string input = args.Length > 0 ? args[0] : ReadLine();
 
             if (string.IsNullOrWhiteSpace(input))
             {
@@ -81,7 +82,7 @@ static class Program
         }
     }
 
-    static void CleanFolder(string path, string displayName)
+    private static void CleanFolder(string path, string displayName)
     {
         if (!Directory.Exists(path))
         {
@@ -114,7 +115,7 @@ static class Program
         }
     }
 
-    static void EmptyRecycleBin()
+    private static void EmptyRecycleBin()
     {
         try
         {
@@ -129,14 +130,14 @@ static class Program
         }
     }
 
-    static bool IsAdministrator()
+    private static bool IsAdministrator()
     {
         var identity = WindowsIdentity.GetCurrent();
         var principal = new WindowsPrincipal(identity);
         return principal.IsInRole(WindowsBuiltInRole.Administrator);
     }
 
-    static void RestartAsAdmin(string[] args)
+    private static void RestartAsAdmin(string[] args)
     {
         var exeName = Process.GetCurrentProcess().MainModule.FileName;
         var startInfo = new ProcessStartInfo
@@ -156,12 +157,11 @@ static class Program
         Environment.Exit(0);
     }
 
-    static void WriteColored(string text, ConsoleColor color)
+    private static void WriteColored(string text, ConsoleColor color)
     {
         var original = Console.ForegroundColor;
         ForegroundColor = color;
         WriteLine(text);
         ForegroundColor = original;
     }
-
 }
