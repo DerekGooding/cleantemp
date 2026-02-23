@@ -7,6 +7,7 @@ made just for fun and improving myself!
 */
 using System.Security.Principal;
 using System.Diagnostics;
+using static System.Console;
 
 namespace CleanTemp;
 
@@ -22,15 +23,15 @@ static class Program
 
         while (true)
         {
-            Console.ForegroundColor = ConsoleColor.Cyan; // you can change color of "cleantemp >" by editing "ConsoleColor.Cyan" (like ConsoleColor.Red or ConsoleColor.Yellow). you can also do this to other lines that has this.
-            Console.Write("cleantemp > ");
-            Console.ResetColor();
+            ForegroundColor = ConsoleColor.Cyan; // you can change color of "cleantemp >" by editing "ConsoleColor.Cyan" (like ConsoleColor.Red or ConsoleColor.Yellow). you can also do this to other lines that has this.
+            Write("cleantemp > ");
+            ResetColor();
             string input = args.Length > 0 ? args[0] : Console.ReadLine();
 
             if (string.IsNullOrWhiteSpace(input))
             {
                 WriteColored("Blank input", ConsoleColor.Yellow);
-                args = new string[0];
+                args = [];
                 continue;
             }
 
@@ -76,7 +77,7 @@ static class Program
                 WriteColored("Done, thanks for using!", ConsoleColor.Green); // kinda buggy, double check if you dont think it works
             }
 
-            args = new string[0];
+            args = [];
         }
     }
 
@@ -158,9 +159,9 @@ static class Program
     static void WriteColored(string text, ConsoleColor color)
     {
         var original = Console.ForegroundColor;
-        Console.ForegroundColor = color;
-        Console.WriteLine(text);
-        Console.ForegroundColor = original;
+        ForegroundColor = color;
+        WriteLine(text);
+        ForegroundColor = original;
     }
 
 }
