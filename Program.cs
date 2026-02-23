@@ -22,15 +22,17 @@ internal static class Program
             RestartAsAdmin(args);
         }
 
+        string[] inputs = args;
+
         while (true)
         {
             "cleantemp > ".Write(ConsoleColor.Cyan);
-            string? input = args.Length > 0 ? args[0] : ReadLine();
+            string? input = inputs.Length > 0 ? inputs[0] : ReadLine();
 
             if (string.IsNullOrWhiteSpace(input))
             {
                 "Blank input".Write(ConsoleColor.Yellow);
-                args = [];
+                inputs = [];
                 continue;
             }
 
@@ -74,10 +76,10 @@ internal static class Program
 
             if (prefetchSuccess || command == "cleantemp")
             {
-                "Done, thanks for using!".Write(ConsoleColor.Green); // kinda buggy, double check if you dont think it works
+                "Done, thanks for using!".Write(ConsoleColor.Green);
             }
 
-            args = [];
+            inputs = [];
         }
     }
 
@@ -95,6 +97,7 @@ internal static class Program
         {
             foreach (FileInfo file in directory.GetFiles())
             {
+                file.Attributes = FileAttributes.Normal;
                 try { file.Delete(); } catch { success = false; }
             }
 
