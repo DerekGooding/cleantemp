@@ -36,6 +36,10 @@ internal static partial class Program
         var inputs = args;
         var running = true;
 
+        DirectoryInfo userTemp = new(Environment.GetEnvironmentVariable("TEMP") ?? Path.GetTempPath());
+        DirectoryInfo windowsTemp = new(@"C:\Windows\Temp");
+        DirectoryInfo prefetch = new(@"C:\Windows\Prefetch");
+
         while (running)
         {
             "cleantemp > ".Write(ConsoleColor.Cyan);
@@ -49,9 +53,7 @@ internal static partial class Program
             }
 
             var command = input.ToLower();
-            DirectoryInfo userTemp = new(Environment.GetEnvironmentVariable("TEMP") ?? Path.GetTempPath());
-            DirectoryInfo windowsTemp = new(@"C:\Windows\Temp");
-            DirectoryInfo prefetch = new(@"C:\Windows\Prefetch");
+
 
             var prefetchSuccess = true;
 
