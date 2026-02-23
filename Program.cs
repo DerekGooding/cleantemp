@@ -107,13 +107,13 @@ internal static class Program
             foreach (FileInfo file in directory.GetFiles())
             {
                 file.Attributes = FileAttributes.Normal;
-                //try { file.Delete(); } catch { success = false; }
+                try { file.Delete(); } catch { success = false; }
             }
 
             foreach (DirectoryInfo dir in directory.GetDirectories())
             {
                 CleanFolderRecursive(dir);
-                //try { dir.Delete(); } catch { success = false; }
+                try { dir.Delete(); } catch { success = false; }
             }
 
             if (success)
@@ -139,12 +139,12 @@ internal static class Program
         {
             foreach (FileInfo file in directory.GetFiles())
             {
-                //try { file.Delete(); } catch { success = false; }
+                try { file.Delete(); } catch { success = false; }
             }
             foreach (DirectoryInfo dir in directory.GetDirectories())
             {
                 CleanFolderRecursive(dir);
-                //try { dir.Delete(); } catch { success = false; }
+                try { dir.Delete(); } catch { success = false; }
             }
             if (success)
                 $"{directory.FullName} cleaned".Write(ConsoleColor.Green);
@@ -168,7 +168,7 @@ internal static class Program
         {
             try
             {
-                //item.InvokeVerb("delete");
+                item.InvokeVerb("delete");
             }
             catch
             {
