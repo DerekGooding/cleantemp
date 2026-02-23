@@ -8,6 +8,7 @@ made just for fun and improving myself!
 
 using System.Security.Principal;
 using System.Diagnostics;
+using Shell32;
 using static System.Console;
 
 namespace CleanTemp;
@@ -27,7 +28,7 @@ internal static class Program
             ForegroundColor = ConsoleColor.Cyan; // you can change color of "cleantemp >" by editing "ConsoleColor.Cyan" (like ConsoleColor.Red or ConsoleColor.Yellow). you can also do this to other lines that has this.
             Write("cleantemp > ");
             ResetColor();
-            string input = args.Length > 0 ? args[0] : ReadLine();
+            string? input = args.Length > 0 ? args[0] : ReadLine();
 
             if (string.IsNullOrWhiteSpace(input))
             {
@@ -38,7 +39,7 @@ internal static class Program
 
             string command = input.ToLower();
             string userTemp = Environment.GetEnvironmentVariable("TEMP") ?? Path.GetTempPath();
-            string windowsTemp = @"C:\Windows\Temp";
+            const string windowsTemp = @"C:\Windows\Temp";
 
             bool prefetchSuccess = true;
 
@@ -119,9 +120,13 @@ internal static class Program
     {
         try
         {
-            var shell = Type.GetTypeFromProgID("Shell.Application");
-            dynamic recycleBin = Activator.CreateInstance(shell);
-            recycleBin.NameSpace(10).Items().InvokeVerb("delete");
+            var shell = new Shell();
+            Folder recycleBin = shell.NameSpace(10);
+            foreach (FolderItem item in recycleBin.Items())
+            {
+                item.InvokeVerb("delete");
+            }
+
             WriteColored("Recycle Bin emptied", ConsoleColor.Green);
         }
         catch
@@ -139,7 +144,7 @@ internal static class Program
 
     private static void RestartAsAdmin(string[] args)
     {
-        var exeName = Process.GetCurrentProcess().MainModule.FileName;
+        var exeName = Environment.ProcessPath;
         var startInfo = new ProcessStartInfo
         {
             FileName = exeName,
@@ -159,7 +164,7 @@ internal static class Program
 
     private static void WriteColored(string text, ConsoleColor color)
     {
-        var original = Console.ForegroundColor;
+        var original = ForegroundColor;
         ForegroundColor = color;
         WriteLine(text);
         ForegroundColor = original;
