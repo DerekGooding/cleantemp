@@ -20,19 +20,16 @@ internal static class Program
         if (!IsAdministrator())
         {
             RestartAsAdmin(args);
-            return;
         }
 
         while (true)
         {
-            ForegroundColor = ConsoleColor.Cyan; // you can change color of "cleantemp >" by editing "ConsoleColor.Cyan" (like ConsoleColor.Red or ConsoleColor.Yellow). you can also do this to other lines that has this.
-            Write("cleantemp > ");
-            ResetColor();
+            "cleantemp > ".Write(ConsoleColor.Cyan);
             string? input = args.Length > 0 ? args[0] : ReadLine();
 
             if (string.IsNullOrWhiteSpace(input))
             {
-                WriteColored("Blank input", ConsoleColor.Yellow);
+                "Blank input".Write(ConsoleColor.Yellow);
                 args = [];
                 continue;
             }
@@ -62,21 +59,21 @@ internal static class Program
                     break;
 
                 case "credits":
-                    WriteColored("by cinax - https://github.com/cinaxdev/cleantemp", ConsoleColor.Blue); // please do not edit credits
+                    "by cinax - https://github.com/cinaxdev/cleantemp".Write(ConsoleColor.Blue); // please do not edit credits
                     break;
 
                 case "exit":
                     return;
 
                 default:
-                    WriteColored("Invalid command! Available commands are cleantemp, fullclean and cleanprefetch", ConsoleColor.Red);
+                    "Invalid command! Available commands are cleantemp, fullclean and cleanprefetch".Write(ConsoleColor.Red);
                     prefetchSuccess = false;
                     break;
             }
 
             if (prefetchSuccess || command == "cleantemp")
             {
-                WriteColored("Done, thanks for using!", ConsoleColor.Green); // kinda buggy, double check if you dont think it works
+                "Done, thanks for using!".Write(ConsoleColor.Green); // kinda buggy, double check if you dont think it works
             }
 
             args = [];
@@ -87,7 +84,7 @@ internal static class Program
     {
         if (!Directory.Exists(path))
         {
-            WriteColored($"{displayName} folder doesnt exist: {path}", ConsoleColor.Yellow);
+            $"{displayName} folder doesnt exist: {path}".Write(ConsoleColor.Yellow);
             return;
         }
 
@@ -106,13 +103,13 @@ internal static class Program
             }
 
             if (success)
-                WriteColored($"{displayName} cleaned: {path}", ConsoleColor.Green);
+                $"{displayName} cleaned: {path}".Write(ConsoleColor.Green);
             else
-                WriteColored($"{displayName} could not be completely cleaned (Cannot delete some files): {path}", ConsoleColor.DarkYellow);
+                $"{displayName} could not be completely cleaned (Cannot delete some files): {path}".Write(ConsoleColor.DarkYellow);
         }
         catch
         {
-            WriteColored($"{displayName} could not be cleaned: {path}", ConsoleColor.Red);
+            $"{displayName} could not be cleaned: {path}".Write(ConsoleColor.Red);
         }
     }
 
@@ -128,11 +125,11 @@ internal static class Program
             }
             catch
             {
-                WriteColored($"Failed to delete: {item.Name}", ConsoleColor.Red);
+                $"Failed to delete: {item.Name}".Write(ConsoleColor.Red);
             }
         }
 
-        WriteColored("Recycle Bin emptied", ConsoleColor.Green);
+        "Recycle Bin emptied".Write(ConsoleColor.Green);
     }
 
     private static bool IsAdministrator()
@@ -160,13 +157,5 @@ internal static class Program
         catch { }
 
         Environment.Exit(0);
-    }
-
-    private static void WriteColored(string text, ConsoleColor color)
-    {
-        var original = ForegroundColor;
-        ForegroundColor = color;
-        WriteLine(text);
-        ForegroundColor = original;
     }
 }
