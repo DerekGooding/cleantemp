@@ -29,13 +29,13 @@ internal static class Program
             Environment.Exit(0);
         };
 
-        string[] inputs = args;
-        bool running = true;
+        var inputs = args;
+        var running = true;
 
         while (running)
         {
             "cleantemp > ".Write(ConsoleColor.Cyan);
-            string? input = inputs.Length > 0 ? inputs[0] : ReadLine();
+            var input = inputs.Length > 0 ? inputs[0] : ReadLine();
 
             if (string.IsNullOrWhiteSpace(input))
             {
@@ -44,46 +44,67 @@ internal static class Program
                 continue;
             }
 
-            string command = input.ToLower();
+            var command = input.ToLower();
             DirectoryInfo userTemp = new(Environment.GetEnvironmentVariable("TEMP") ?? Path.GetTempPath());
             DirectoryInfo windowsTemp = new(@"C:\Windows\Temp");
             DirectoryInfo prefetch = new(@"C:\Windows\Prefetch");
 
-            bool prefetchSuccess = true;
+            var prefetchSuccess = true;
 
             switch (command)
             {
-                case "fullclean":
+                case "full":
+                case "f":
                     CleanFolder(userTemp, "User Temp");
                     CleanFolder(windowsTemp, "Windows Temp");
                     CleanFolder(prefetch, "Prefetch");
                     EmptyRecycleBin();
                     break;
 
-                case "cleantemp":
+                case "temp":
+                case "t":
                     CleanFolder(userTemp, "User Temp");
                     CleanFolder(windowsTemp, "Windows Temp");
                     break;
 
-                case "cleanprefetch":
+                case "prefetch":
+                case "p":
                     CleanFolder(prefetch, "Prefetch");
                     break;
 
                 case "credits":
+                case "c":
                     "by cinax - https://github.com/cinaxdev/cleantemp".Write(ConsoleColor.Blue); // please do not edit credits
                     break;
 
                 case "exit":
+                case "quit":
+                case "q":
                     running = false;
                     break;
 
+                case "help":
+                case "h":
+                case "?":
+                    """
+                    Available commands:
+                      (f)ull      - Clean User Temp, Windows Temp, Prefetch and empty Recycle Bin
+                      (t)emp      - Clean User Temp and Windows Temp folders
+                      (p)refetch  - Clean Prefetch folder
+                      (h)elp      - Show this help message
+                      (c)redits   - Show credits
+                      (q)uit      - Exit the program
+                    """.Write(ConsoleColor.Cyan);
+                    prefetchSuccess = false;
+                    break;
+
                 default:
-                    "Invalid command! Available commands are cleantemp, fullclean and cleanprefetch".Write(ConsoleColor.Red);
+                    "Invalid command! Type (h)elp for commands".Write(ConsoleColor.Red);
                     prefetchSuccess = false;
                     break;
             }
 
-            if (prefetchSuccess || command == "cleantemp")
+            if (prefetchSuccess || command == "temp")
             {
                 "Done, thanks for using!".Write(ConsoleColor.Green);
             }
@@ -100,7 +121,7 @@ internal static class Program
             return;
         }
 
-        bool success = true;
+        var success = true;
 
         try
         {
@@ -134,7 +155,7 @@ internal static class Program
             $"{directory.FullName} doesnt exist".Write(ConsoleColor.Yellow);
             return;
         }
-        bool success = true;
+        var success = true;
         try
         {
             foreach (FileInfo file in directory.GetFiles())
