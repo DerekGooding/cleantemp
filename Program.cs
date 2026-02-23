@@ -129,13 +129,13 @@ internal static partial class Program
 
         try
         {
-            foreach (FileInfo file in directory.GetFiles())
+            foreach (var file in directory.GetFiles())
             {
                 file.Attributes = FileAttributes.Normal;
                 try { file.Delete(); } catch { success = false; }
             }
 
-            foreach (DirectoryInfo dir in directory.GetDirectories())
+            foreach (var dir in directory.GetDirectories())
             {
                 CleanFolder(dir);
                 if (displayName?.Length == 0)
