@@ -152,6 +152,9 @@ internal static class Program
     {
         var shell = new Shell();
         Folder recycleBin = shell.NameSpace(10);
+        if (recycleBin == null)
+            return;
+
         foreach (FolderItem item in recycleBin.Items())
         {
             try
