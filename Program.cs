@@ -6,15 +6,19 @@ made just for fun and improving myself!
 :D
 */
 
-using System.Security.Principal;
 using System.Diagnostics;
-using Shell32;
+using System.Runtime.InteropServices;
+using System.Security.Principal;
 using static System.Console;
 
 namespace CleanTemp;
 
-internal static class Program
+internal static partial class Program
 {
+    [LibraryImport("Shell32.dll", StringMarshalling = StringMarshalling.Utf16)]
+    private static partial int SHEmptyRecycleBin(IntPtr hwnd, string? pszRootPath, uint dwFlags);
+    // dwFlags = 0x00000007 to suppress all UI and confirmation
+
     private static void Main(string[] args)
     {
         if (!IsAdministrator())
@@ -113,7 +117,7 @@ internal static class Program
         }
     }
 
-    private static void CleanFolder(DirectoryInfo directory, string displayName)
+    private static void CleanFolder(DirectoryInfo directory, string displayName = "")
     {
         if (!directory.Exists)
         {
@@ -133,8 +137,11 @@ internal static class Program
 
             foreach (DirectoryInfo dir in directory.GetDirectories())
             {
-                CleanFolderRecursive(dir);
-                try { dir.Delete(); } catch { success = false; }
+                CleanFolder(dir);
+                if (displayName?.Length == 0)
+                {
+                    try { dir.Delete(); } catch { success = false; }
+                }
             }
 
             if (success)
@@ -148,56 +155,18 @@ internal static class Program
         }
     }
 
-    private static void CleanFolderRecursive(DirectoryInfo directory)
-    {
-        if (!directory.Exists)
-        {
-            $"{directory.FullName} doesnt exist".Write(ConsoleColor.Yellow);
-            return;
-        }
-        var success = true;
-        try
-        {
-            foreach (FileInfo file in directory.GetFiles())
-            {
-                try { file.Delete(); } catch { success = false; }
-            }
-            foreach (DirectoryInfo dir in directory.GetDirectories())
-            {
-                CleanFolderRecursive(dir);
-                try { dir.Delete(); } catch { success = false; }
-            }
-            if (success)
-                $"{directory.FullName} cleaned".Write(ConsoleColor.Green);
-            else
-                $"{directory.FullName} could not be completely cleaned (Cannot delete some files)".Write(ConsoleColor.DarkYellow);
-        }
-        catch
-        {
-            $"{directory.FullName} could not be cleaned".Write(ConsoleColor.Red);
-        }
-    }
-
     private static void EmptyRecycleBin()
     {
-        var shell = new Shell();
-        Folder recycleBin = shell.NameSpace(10);
-        if (recycleBin == null)
-            return;
+        const uint SHERB_NOCONFIRMATION = 0x00000001;
+        const uint SHERB_NOPROGRESSUI = 0x00000002;
+        const uint SHERB_NOSOUND = 0x00000004;
 
-        foreach (FolderItem item in recycleBin.Items())
-        {
-            try
-            {
-                item.InvokeVerb("delete");
-            }
-            catch
-            {
-                $"Failed to delete: {item.Name}".Write(ConsoleColor.Red);
-            }
-        }
+        var result = SHEmptyRecycleBin(IntPtr.Zero, null, SHERB_NOCONFIRMATION | SHERB_NOPROGRESSUI | SHERB_NOSOUND);
 
-        "Recycle Bin emptied".Write(ConsoleColor.Green);
+        if (result == 0)
+            "Recycle Bin emptied".Write(ConsoleColor.Green);
+        else
+            $"Recycle Bin could not be emptied (HRESULT: {result})".Write(ConsoleColor.Red);
     }
 
     private static bool IsAdministrator()
