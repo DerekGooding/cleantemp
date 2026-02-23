@@ -35,8 +35,9 @@ internal static class Program
             }
 
             string command = input.ToLower();
-            string userTemp = Environment.GetEnvironmentVariable("TEMP") ?? Path.GetTempPath();
-            const string windowsTemp = @"C:\Windows\Temp";
+            DirectoryInfo userTemp = new(Environment.GetEnvironmentVariable("TEMP") ?? Path.GetTempPath());
+            DirectoryInfo windowsTemp = new(@"C:\Windows\Temp");
+            DirectoryInfo prefetch = new(@"C:\Windows\Prefetch");
 
             bool prefetchSuccess = true;
 
@@ -45,7 +46,7 @@ internal static class Program
                 case "fullclean":
                     CleanFolder(userTemp, "User Temp");
                     CleanFolder(windowsTemp, "Windows Temp");
-                    CleanFolder(@"C:\Windows\Prefetch", "Prefetch");
+                    CleanFolder(prefetch, "Prefetch");
                     EmptyRecycleBin();
                     break;
 
@@ -55,7 +56,7 @@ internal static class Program
                     break;
 
                 case "cleanprefetch":
-                    CleanFolder(@"C:\Windows\Prefetch", "Prefetch");
+                    CleanFolder(prefetch, "Prefetch");
                     break;
 
                 case "credits":
@@ -80,11 +81,11 @@ internal static class Program
         }
     }
 
-    private static void CleanFolder(string path, string displayName)
+    private static void CleanFolder(DirectoryInfo directory, string displayName)
     {
-        if (!Directory.Exists(path))
+        if (!directory.Exists)
         {
-            $"{displayName} folder doesnt exist: {path}".Write(ConsoleColor.Yellow);
+            $"{displayName} folder doesnt exist: {directory.FullName}".Write(ConsoleColor.Yellow);
             return;
         }
 
@@ -92,24 +93,55 @@ internal static class Program
 
         try
         {
-            foreach (string file in Directory.GetFiles(path))
+            foreach (FileInfo file in directory.GetFiles())
             {
-                try { File.Delete(file); } catch { success = false; }
+                try { file.Delete(); } catch { success = false; }
             }
 
-            foreach (string dir in Directory.GetDirectories(path))
+            foreach (DirectoryInfo dir in directory.GetDirectories())
             {
-                try { Directory.Delete(dir, true); } catch { success = false; }
+                CleanFolderRecursive(dir);
+                try { dir.Delete(); } catch { success = false; }
             }
 
             if (success)
-                $"{displayName} cleaned: {path}".Write(ConsoleColor.Green);
+                $"{displayName} cleaned: {directory.FullName}".Write(ConsoleColor.Green);
             else
-                $"{displayName} could not be completely cleaned (Cannot delete some files): {path}".Write(ConsoleColor.DarkYellow);
+                $"{displayName} could not be completely cleaned (Cannot delete some files): {directory.FullName}".Write(ConsoleColor.DarkYellow);
         }
         catch
         {
-            $"{displayName} could not be cleaned: {path}".Write(ConsoleColor.Red);
+            $"{displayName} could not be cleaned: {directory.FullName}".Write(ConsoleColor.Red);
+        }
+    }
+
+    private static void CleanFolderRecursive(DirectoryInfo directory)
+    {
+        if (!directory.Exists)
+        {
+            $"{directory.FullName} doesnt exist".Write(ConsoleColor.Yellow);
+            return;
+        }
+        bool success = true;
+        try
+        {
+            foreach (FileInfo file in directory.GetFiles())
+            {
+                try { file.Delete(); } catch { success = false; }
+            }
+            foreach (DirectoryInfo dir in directory.GetDirectories())
+            {
+                CleanFolderRecursive(dir);
+                try { dir.Delete(); } catch { success = false; }
+            }
+            if (success)
+                $"{directory.FullName} cleaned".Write(ConsoleColor.Green);
+            else
+                $"{directory.FullName} could not be completely cleaned (Cannot delete some files)".Write(ConsoleColor.DarkYellow);
+        }
+        catch
+        {
+            $"{directory.FullName} could not be cleaned".Write(ConsoleColor.Red);
         }
     }
 
@@ -147,7 +179,7 @@ internal static class Program
             FileName = exeName,
             Verb = "runas",
             Arguments = string.Join(" ", args),
-            UseShellExecute = true
+            UseShellExecute = true,
         };
 
         try
